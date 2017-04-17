@@ -129,7 +129,7 @@ L.Control.GroupedLayers = L.Control.extend({
 
   _addLayer: function (layer, name, group, overlay) {
     var id = L.Util.stamp(layer);
-
+    
     var _layer = {
       layer: layer,
       name: name,
@@ -184,7 +184,7 @@ L.Control.GroupedLayers = L.Control.extend({
   _onLayerChange: function (e) {
     var obj = this._getLayer(L.Util.stamp(e.layer)),
       type;
-
+      
     if (!obj) {
       return;
     }
@@ -238,7 +238,7 @@ L.Control.GroupedLayers = L.Control.extend({
     } else {
       input = this._createRadioElement('leaflet-base-layers', checked);
     }
-
+    
     input.layerId = L.Util.stamp(obj.layer);
     input.groupID = obj.group.id;
     L.DomEvent.on(input, 'click', this._onInputClick, this);
@@ -333,7 +333,7 @@ L.Control.GroupedLayers = L.Control.extend({
       input = inputs[i];
       if (input.className === 'leaflet-control-layers-selector') {
         obj = this._getLayer(input.layerId);
-
+        
         if (input.checked && !this._map.hasLayer(obj.layer)) {
           this._map.addLayer(obj.layer);
         } else if (!input.checked && this._map.hasLayer(obj.layer)) {

@@ -10,10 +10,7 @@
         <link rel="stylesheet" href="css/mapstyle.css" />
 <!--        <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet-src.js"></script>-->
         <script src="js/leaflet-1.0.3/leaflet-src.js"></script>
-        <script
-            src="https://code.jquery.com/jquery-3.1.1.min.js"
-            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-        crossorigin="anonymous"></script>
+        <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
         <!-- Load Esri Leaflet from CDN 
         <script src="https://unpkg.com/esri-leaflet@2.0.7"></script>-->
         <script src="js/esri-leaflet2.0.7.js"></script>
@@ -27,28 +24,34 @@
                 <script src="https://unpkg.com/esri-leaflet-cluster@2.0.0"></script>
                  Load Heatmap Feature Layer from CDN 
                 <script src="https://unpkg.com/esri-leaflet-heatmap@2.0.0"></script>-->
+        
+        <script type="text/javascript" src="libs/Leaflet.OpacityControls/lib/opacity/Control.Opacity.js"></script>
+        <script src="libs/Leaflet.OpacityControls/lib/jquery/jquery-1.9.1.js"></script>
+        <script src="libs/Leaflet.OpacityControls/lib/jquery/jquery-ui-1.10.3.custom.min.js"></script>
+        <link rel="stylesheet" href="libs/Leaflet.OpacityControls/lib/jquery/jquery-ui-1.10.3.custom.min.css" />
+
         <script type="text/javascript" src="js/leaflet.ajax.min.js"></script>
         <script src="js/L.Control.Locate.min.js" charset="utf-8"></script>
         <script src="js/L.Control.Sidebar.js" charset="utf-8"></script>
         <script src="js/Control.Loading.js"></script>
-        <script src="js/leaflet.groupedlayercontrol.js"></script>
-<!--        <script src="js/leaflet.active-layers.min.js"></script>-->
+<!--        <script src="js/leaflet.groupedlayercontrol.js"></script>-->
+        <script src="js/leaflet.active-layers.min.js"></script>
         <script type="text/javascript" src="js/NonTiledLayer.js"></script>
         <script type="text/javascript" src="js/NonTiledLayer.WMS.js"></script>
         <script type="text/javascript" src="js/iso8601.min.js"></script>
-        <!--  seems SLOWER to use this than the nontiledlayer js      
-        <script type="text/javascript" src="js/leaflet.wms.js"></script>-->
+        <!--  seems SLOWER to use this than the nontiledlayer js  -->    
+        <script type="text/javascript" src="js/leaflet.wms.js"></script>
         <script type="text/javascript" src="js/timedimension/leaflet.timedimension.js"></script>
         <script type="text/javascript" src="js/timedimension/leaflet.timedimension.util.js"></script>
         <script type="text/javascript" src="js/timedimension/leaflet.timedimension.layer.js"></script>
         <script type="text/javascript" src="js/timedimension/leaflet.timedimension.layer.wms.js"></script>
         <script type="text/javascript" src="js/timedimension/leaflet.timedimension.player.js"></script>
         <script type="text/javascript" src="js/timedimension/leaflet.timedimension.control.js"></script>
-<!--        <script type="text/javascript" src="js/esri-leaflet-legend.js"></script>-->
+        <script type="text/javascript" src="js/esri-leaflet-legend.js"></script>
 
         <!-- LOCALLY CACHE TILES FOR 30 MINS: https://github.com/MazeMap/Leaflet.TileLayer.PouchDBCached-->
-        <script src="https://unpkg.com/pouchdb@^5.2.0/dist/pouchdb.js"></script>
-	<script src="https://unpkg.com/leaflet.tilelayer.pouchdbcached@latest/L.TileLayer.PouchDBCached.js"></script>
+        <script src="js/pouchdb.js"></script>
+	<script src="js/L.TileLayer.PouchDBCached.js"></script>
         
         
         
@@ -58,23 +61,7 @@
         <div id="sidebar">
             <p>Right click on map to load NOAA weather information.</p>
         </div>
-        <!--        <div id="maplayers">
-                    <form id="rendered-form" name="rendered-form">
-                            <div class="fb-radio form-group field-radio-group-wxlayers">
-                                    <label class="fb-radio-group-label" for="radio-group-wxlayers">Weather Layers</label>
-                                    <div class="radio-group-div">
-                                            <input class="radio-group" id="radio-group-wxlayers-0" name="radio-group-wxlayers" type="radio" value="0"> <label for="radio-group-wxlayers-0">Winds</label><br>
-                                            <input class="radio-group" id="radio-group-wxlayers-1" name="radio-group-wxlayers" type="radio" value="4"> <label for="radio-group-wxlayers-1">Surface Max Air Temp (2m AGL)</label><br>
-                                            <input class="radio-group" id="radio-group-wxlayers-2" name="radio-group-wxlayers" type="radio" value="8"> <label for="radio-group-wxlayers-2">Surface Min Air Temp (2m AGL)</label><br>
-                                            <input class="radio-group" id="radio-group-wxlayers-3" name="radio-group-wxlayers" type="radio" value="12"> <label for="radio-group-wxlayers-3">6hr Precip Amount</label><br>
-                                            <input class="radio-group" id="radio-group-wxlayers-4" name="radio-group-wxlayers" type="radio" value="20"> <label for="radio-group-wxlayers-4">12hr Precip Prob</label><br>
-                                            <input class="radio-group" id="radio-group-wxlayers-5" name="radio-group-wxlayers" type="radio" value="24"> <label for="radio-group-wxlayers-5">Total Sky Cover %</label><br>
-                                            <input class="radio-group" id="radio-group-wxlayers-6" name="radio-group-wxlayers" type="radio" value="40"> <label for="radio-group-wxlayers-6">Surface RH % (2m AGL)</label><br>
-                                    </div>
-                            </div>
-                    </form>
-                </div>-->
-
+        <div id="oSlider" style="height:200px;"></div>
         <div id="map"></div>
 <!--        <div id="time-ranges" class="leaflet-bar">
           <form action="#" id="form">

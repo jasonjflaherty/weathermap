@@ -2,10 +2,20 @@
 var today = new Date(); //Today's Date
 var minutes = today.getUTCMinutes(0, 0);
 var hours = today.getUTCHours() - 8;
-var n = 4; //number of days to add.
+var n = 1; //number of days to add.
 var endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + n, hours);
-var rightNow = today.getTime();
-console.log(rightNow);
+var tommorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1, hours);
+console.log(tommorrow);
+
+
+
+//proxy script
+var proxy = 'proxy.php';
+
+//var timeForm = document.getElementById('form');
+//  var startTimeInput = document.getElementById('from');
+//  var endTimeInput = document.getElementById('to');
+
 /*Basemap...*/
 var topo = L.esri.basemapLayer("USATopo");
 var Esri_WorldStreetMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
@@ -18,28 +28,59 @@ var Esri_NatGeoWorldMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/res
 
 var map = L.map('map', {
     layers: [Esri_WorldStreetMap],
-    center: [42, -119],
-    zoom: 7,
+    center: [43.6007847,-116.3039378],
+    zoom: 5,
     loadingControl: true,
+//    timeDimension: true,
+//    timeDimensionControl: true,
+//    timeDimensionControlOptions: {
+//        autoPlay: false,
+//        playerOptions: {
+//            buffer: 12,
+//            transitionTime: 500,
+//            loop: true,
+//            loopButton: true,
+//        },
+//        speedSlider: true
+//    },
+//    timeDimensionOptions: {
+//        loadingTimeout: 5000,
+//        //n-1...
+//        timeInterval: "PT12H/" + today,
+//        period: "PT4M",
+//        currentTime:true,
+//      
+//    }
     timeDimension: true,
     timeDimensionControl: true,
+    timeDimensionOptions:{
+      loadingTimeout: 7000,
+      timeInterval: "PT24H/" + tommorrow.toISOString(),
+      period:"PT3H",
+    },
     timeDimensionControlOptions: {
         autoPlay: false,
+        minSpeed:0.5,
+        maxSpeed:1.5,
+        timeSliderDragUpdate:true,
         playerOptions: {
             buffer: 12,
-            transitionTime: 500,
+            transitionTime: 250,
             loop: true,
-            loopButton: true,
-        },
-        speedSlider: true
+        }
     },
-    timeDimensionOptions: {
-        loadingTimeout: 5000,
-        //n-1...
-        timeInterval: "P3D/" + endDate.toISOString(),
-        period: "PT3H"
-    }
 });
+
+
+//map.timeDimension.on('timeload', function(data) {
+//        var date = new Date(map.timeDimension.getCurrentTime());
+//        if (data.time == map.timeDimension.getCurrentTime()) {
+//            var totalTimes = map.timeDimension.getAvailableTimes().length;
+//            var position = map.timeDimension.getAvailableTimes().indexOf(data.time);
+//            console.log(totalTimes + " | " + position);
+//        }
+//    });
+
 
 /*SIDEBAR HOLDS DATA OR SHOULD WE USE POPUPS?*/
 var sidebar = L.control.sidebar('sidebar', {
@@ -82,6 +123,12 @@ var locateControl = L.control.locate({
 
 map.addControl(sidebar);
 
+var popup = L.popup().setContent('<strong>LOADING...</strong>');
+
+map.on("click",function(){
+    popup.setContent("LOADING...");
+    popup.update();
+});
 
 /*
  * placeholder for variable from custom radio button layer list...
@@ -104,13 +151,62 @@ map.addControl(sidebar);
 //LOADING AFTER DOM READY TO SEE LAYER GROUP...
 $(document).ready(function () {
     $('body').append('<div id="loading"><p>LOADING DATA...</p><div class="progress"><div class="indeterminate"></div></div></div>');
-    $(".leaflet-control-layers-group label > input").click(function () {
-        $("#loading").fadeIn(500);
+    $("#leaflet-control-layers-group-1 label > input").on("click",function () {
+        if($(this).is(':checked')){ 
+            $("#loading").fadeIn(500);
+            $(".leaflet-bar-timecontrol").fadeOut(100);
+        }else{
+            $("#loading").fadeOut(500);
+        }
     });
-
+    $(".leaflet-bar-timecontrol").hide();
+    $("#leaflet-control-layers-group-2 label > input").on("click",function () {
+         if($(this).is(':checked')){ 
+            $("#loading").fadeIn(500);
+            $(".leaflet-bar-timecontrol").fadeIn(100);
+        }else{
+            $(".leaflet-bar-timecontrol").fadeOut(100);
+            $("#loading").fadeOut(500);
+        }
+    });
+    
+     //'basemap'
+    $(".leaflet-control-layers-base input").on("click",function(){
+        console.log(activeControl.getActiveBaseLayer().name);
+    }); 
+    
+    //overlays
+    $(".leaflet-control-layers-overlays input").on("click",function(){
+        var overlayLayers = activeControl.getActiveOverlayLayers();
+        for (var overlayId in overlayLayers) {
+            $( "#oSlider" ).slider({
+                orientation: "vertical",
+                range: "min",
+                min: 1,
+                max: 9,
+                value: 6,
+                steps:0.1,
+                slide: function( event, ui ) {
+                  console.log("0." + ui.value);
+                  //console.log(overlayLayers[overlayId].layer.options.opacity);
+                  
+                  var lOpacity = overlayLayers[overlayId].layer.options.opacity;
+                  console.log(lOpacity);
+                  
+                  skyCover.opacity(ui.value);
+                    //overlayLayers[overlayId].setOpacity(ui.value);
+                }
+            });
+            //console.log($( "#oSlider" ).slider("." + "value" ));
+            opacitySlider.setOpacityLayer(overlayLayers[overlayId]);
+        } 
+    });
+    
+    
+    
+    
 });
-//proxy script
-var proxy = 'proxy.php';
+
 /* Loads of NOAA data overlays*/
 //var regions = "https://apps.fs.usda.gov/arcx/rest/services/EDW/EDW_RegionBoundaries_01/MapServer";
 var forecastRest = 'https://nowcoast.noaa.gov/arcgis/rest/services/nowcoast/forecast_meteoceanhydro_sfc_ndfd_time/MapServer';
@@ -123,71 +219,154 @@ var rtmaRest = "https://nowcoast.noaa.gov/arcgis/rest/services/nowcoast/analysis
 //            var allHazardsGeoJson = 'http://preview.weather.gov/mwp/data/iris/allhazard.geojson';
 //            var geojsonLayer = L.geoJson.ajax(allHazardsGeoJson,{dataType:"jsonp"}).addTo(map);
 
-
-var hazardsWMS = L.nonTiledLayer.wms(hazardsWms, {
-    layers: '8',
-    version: '1.3.0',
+/**** WMS TIME ENABLED ****/
+var nexradWMS = "https://nowcoast.noaa.gov/arcgis/services/nowcoast/radar_meteo_imagery_nexrad_time/MapServer/WMSServer";
+var nexradWMSLayer = L.tileLayer.wms(nexradWMS, {
+    layers: '1',
     format: 'image/png',
     transparent: true,
+    version: '1.3.0',
     opacity: 1,
-    attribution: 'nowCOAST'
+    attribution: 'nowCOAST',
 });
-var hazardsLayer = L.timeDimension.layer.wms(hazardsWMS, {
-    proxy: proxy,
-    cache: 5,
-    updateTimeDimension: false,
-    updateTimeDimensionMode: "replace",
-    //requestTimeFromCapabilities:updateTimeDimension,
-});
-
-var radarWMS = L.nonTiledLayer.wms(forecastWms, {
-    layers: '17',
-    version: '1.3.0',
-    format: 'image/png',
-    transparent: true,
-    opacity: 0.5,
-    attribution: 'nowCOAST'
-});
-
-var radarLayer = L.timeDimension.layer.wms(radarWMS, {
-    proxy: proxy,
-    cache: 5,
-    updateTimeDimension: false,
-    updateTimeDimensionMode: "replace",
-    //requestTimeFromCapabilities:updateTimeDimension,
-});
-//radarLayer.addTo(map);
-var MaxTempWMS = L.nonTiledLayer.wms(forecastWms, {
-    layers: '17',
-    version: '1.3.0',
-    format: 'image/png',
-    transparent: true,
-    opacity: 0.5,
-    attribution: 'nowCOAST'
-});
-var maxTempTD = L.timeDimension.layer.wms(MaxTempWMS, {
+var nexradWMSTimeLayer = L.timeDimension.layer.wms(nexradWMSLayer,{
+    requestTimeFromCapabilities:true,
+    setDefaultTime:false,
+    wmsVersion:'1.3.0',
+    updateTimeDimension: true,
+    updateTimeDimensionMode:'replace',
     //proxy: proxy,
-    cache: 5,
-    updateTimeDimension: false,
-    updateTimeDimensionMode: "replace",
-    //requestTimeFromCapabilities:updateTimeDimension,
 });
-//            MaxTempWMS.on("load", function () {
-//                //console.log("all visible tiles have been loaded");
-//                $("#loading").fadeOut(500);
-//            });
+nexradWMSLayer.on('load', function (e) {
+    console.log(e);
+    $(".leaflet-bar-timecontrol").show();
+    $("#loading").fadeOut(500);
+    
+});
 
+//var overlay = L.WMS.overlay(nexradWMS, {
+//    layers: '1',
+//    format: 'image/png24',
+//    transparent: true,
+//}).addTo(map);
+//var wildfireWMS = "https://nowcoast.noaa.gov/arcgis/services/nowcoast/wwa_meteoceanhydro_longduration_hazards_time/MapServer/WMSServer"
+//var wildfireWMSLayer = L.nonTiledLayer.wms(wildfireWMS, {
+//    layers: '4',
+//    format: 'image/png',
+//    transparent: true,
+//    version: '1.3.0',
+//    opacity: 1,
+//    attribution: 'nowCOAST',
+//});
+//var wildfireWMSTimeLayer = L.timeDimension.layer.wms(wildfireWMSLayer,{
+//    requestTimeFromCapabilities:true,
+//    setDefaultTime:false,
+//    wmsVersion:'1.3.0',
+//    updateTimeDimension: true,
+//    updateTimeDimensionMode:'replace',
+//    //proxy: proxy,
+//});
+//wildfireWMSLayer.on("load", function () {
+//    $(".leaflet-bar-timecontrol").fadeIn();
+//    $("#loading").fadeOut(500);
+//});
+var surfaceAirTempWMSLayer = L.nonTiledLayer.wms(forecastWms, {
+    layers: '25',
+    format: 'image/png',
+    transparent: true,
+    version: '1.3.0',
+    opacity: 1,
+    attribution: 'nowCOAST',
+});
+var surfaceAirTempWMSTimeLayer = L.timeDimension.layer.wms(surfaceAirTempWMSLayer,{
+    requestTimeFromCapabilities:false,
+    setDefaultTime:false,
+    wmsVersion:'1.3.0',
+    updateTimeDimension: false,
+    updateTimeDimensionMode:'replace',
+    //proxy: proxy,
+});
+surfaceAirTempWMSLayer.on("load", function () {
+    $(".leaflet-bar-timecontrol").fadeIn();
+    $("#loading").fadeOut(500);
+});
+
+var surfaceRHWMSLayer = L.nonTiledLayer.wms(forecastWms, {
+    layers: '13',
+    format: 'image/png',
+    transparent: true,
+    version: '1.3.0',
+    opacity: 1,
+    attribution: 'nowCOAST',
+});
+var surfaceRHWMSTimeLayer = L.timeDimension.layer.wms(surfaceRHWMSLayer,{
+    requestTimeFromCapabilities:true,
+    setDefaultTime:false,
+    wmsVersion:'1.3.0',
+    updateTimeDimension: true,
+    updateTimeDimensionMode:'replace',
+    //proxy: proxy,
+});
+surfaceRHWMSLayer.on("load", function () {
+    $(".leaflet-bar-timecontrol").fadeIn();
+    $("#loading").fadeOut(500);
+});
+var lightningWMS = "https://nowcoast.noaa.gov/arcgis/services/nowcoast/sat_meteo_emulated_imagery_lightningstrikedensity_goes_time/MapServer/WMSServer";
+var lightningWMSLayer = L.nonTiledLayer.wms(lightningWMS, {
+    layers: '1',
+    format: 'image/png',
+    transparent: true,
+    version: '1.3.0',
+    opacity: 1,
+    attribution: 'nowCOAST',
+});
+var lightningWMSTimeLayer = L.timeDimension.layer.wms(lightningWMSLayer,{
+    requestTimeFromCapabilities:true,
+    setDefaultTime:false,
+    wmsVersion:'1.3.0',
+    updateTimeDimension: true,
+    updateTimeDimensionMode:'replace',
+    
+    //proxy: proxy,
+});
+lightningWMSLayer.on("load", function () {
+    $(".leaflet-bar-timecontrol").fadeIn();
+    $("#loading").fadeOut(500);
+});
+
+/********* REST ************/
 /********** MIN/MAX TEMPS **************/
 
 var surfaceTemp = L.esri.dynamicMapLayer({
     url: rtmaRest,
     layers: [11],
-    opacity: .7, useCache: true, crossOrigin: true, cacheMaxAge: 1800000
+    opacity: .7, useCache: true, cacheMaxAge: 1800000,
+    format: 'image/png',
+    f:'image'
+//    from: new Date(startTimeInput.value),
+//    to: new Date(endTimeInput.value)
+//    from:map.timeDimension.getAvailableTimes()[0],
+//    to: map.timeDimension.getAvailableTimes().length,
+
 });
 surfaceTemp.on("load", function () {
+//    surfaceTemp.id='st';
+//    console.log();
     //console.log("all visible tiles have been loaded");
     $("#loading").fadeOut(500);
 });
+
+surfaceTemp.bindPopup(function (error, featureCollection) {
+    if (error || featureCollection.features.length === 0) {
+        return "No information found. Try another location.";
+    } else {
+        return 'Surface Temperature: ' + round(featureCollection.features[0].properties['Pixel Value'],2) + '&deg;F';
+    }
+});
+//timeForm.addEventListener('submit', function updateTimeRange(e){
+//    surfaceTemp.setTimeRange(new Date(startTimeInput.value), new Date(endTimeInput.value));
+//    e.preventDefault();
+//  });
 
 //            surfaceTemp.legend(function(error, legend){
 //                if(!error) {
@@ -207,7 +386,8 @@ surfaceTemp.on("load", function () {
 var minTemp = L.esri.dynamicMapLayer({
     url: forecastRest,
     layers: [11],
-    opacity: .7, useCache: true, crossOrigin: true, cacheMaxAge: 1800000
+    opacity: .7, useCache: true, cacheMaxAge: 1800000,
+    f: 'image',
 });
 minTemp.on("load", function () {
     //console.log("all visible tiles have been loaded");
@@ -217,7 +397,8 @@ minTemp.on("load", function () {
 var maxTemp = L.esri.dynamicMapLayer({
     url: forecastRest,
     layers: [11],
-    opacity: .7, useCache: true, crossOrigin: true, cacheMaxAge: 1800000
+    opacity: .7, useCache: true, cacheMaxAge: 1800000,
+    f: 'image',
 });
 maxTemp.on("load", function () {
     //console.log("all visible tiles have been loaded");
@@ -227,11 +408,21 @@ maxTemp.on("load", function () {
 var surfaceDP = L.esri.dynamicMapLayer({
     url: rtmaRest,
     layers: [15],
-    opacity: .7, useCache: true, crossOrigin: true, cacheMaxAge: 1800000
+    opacity: .7, useCache: true, cacheMaxAge: 1800000,
+    format: 'image/png',
+    f:'image'
 });
 surfaceDP.on("load", function () {
     //console.log("all visible tiles have been loaded");
     $("#loading").fadeOut(500);
+});
+surfaceDP.bindPopup(function (error, featureCollection) {
+    if (error || featureCollection.features.length === 0) {
+        return "No information found. Try another location.";
+
+    } else {
+        return 'Dew Point: ' + round(featureCollection.features[0].properties['Pixel Value'],2) + '&deg;F';
+    }
 });
 
 /*********** 24 hour precip ***********/
@@ -243,7 +434,9 @@ surfaceDP.on("load", function () {
 var twentyFourHrPrecip = L.esri.dynamicMapLayer({
     url: quantitaivePrecipEstimates,
     layers: [19],
-    opacity: .7, useCache: true, crossOrigin: true, cacheMaxAge: 1800000,
+    opacity: .7, useCache: true, cacheMaxAge: 1800000,
+    format: 'image/png',
+    f:'image'
 //                f: 'image',
 //                from: new Date(startTimeInput.value),
 //                to: new Date(endTimeInput.value)
@@ -255,6 +448,14 @@ twentyFourHrPrecip.on("load", function () {
     $("#loading").fadeOut(500);
 });
 
+twentyFourHrPrecip.bindPopup(function (error, featureCollection) {
+    if (error || featureCollection.features.length === 0) {
+        return "No information found. Try another location.";
+
+    } else {
+        return '24hr Precipitation: ' + round(featureCollection.features[0].properties['Pixel Value'],2) + 'in';
+    }
+});
 //            timeForm.addEventListener('submit', function updateTimeRange(e){
 //                twentyFourHrPrecip.setTimeRange(new Date(startTimeInput.value), new Date(endTimeInput.value));
 //                e.preventDefault();
@@ -266,45 +467,93 @@ twentyFourHrPrecip.on("load", function () {
 var surfaceRH = L.esri.dynamicMapLayer({
     url: forecastRest,
     layers: [43],
-    opacity: .7, useCache: true, crossOrigin: true, cacheMaxAge: 1800000
+    opacity: .7, useCache: true, cacheMaxAge: 1800000,
+    format: 'image/png',
+    f:'image'
 });
 surfaceRH.on("load", function () {
     //console.log("all visible tiles have been loaded");
     $("#loading").fadeOut(500);
 });
 
+surfaceRH.bindPopup(function (error, featureCollection) {
+    if (error || featureCollection.features.length === 0) {
+        return "No information found. Try another location.";
+
+    } else {
+        return 'RH: ' + round(featureCollection.features[0].properties['Pixel Value'],2) + '%';
+    }
+});
+
+surfaceRH.legend(function(error, legend){
+    if(!error) {
+        var html = '<ul>';
+        for(var i = 0, len = legend.layers.length; i < len; i++) {
+            html += '<li><strong>' + legend.layers[i].layerName + '</strong><ul>';
+            for(var j = 0, jj = legend.layers[i].legend.length; j < jj; j++){
+                html += L.Util.template('<li><img width="{width}" height="{height}" src="data:{contentType};base64,{imageData}"><span>{label}</span></li>', legend.layers[i].legend[j]);
+            }
+            html += '</ul></li>';
+        }
+        html+='</ul>';
+        document.getElementById('legend').innerHTML = html;
+    }
+});
 /*********** surface winds ***********/
 var windKnots = L.esri.dynamicMapLayer({
     url: rtmaRest,
-    layers: [19, 3],
-    opacity: .7, useCache: true, crossOrigin: true, cacheMaxAge: 1800000
+    layers: [3,19],
+    opacity: .7, useCache: true, cacheMaxAge: 1800000,
+    f: 'image',
 });
 windKnots.on("load", function () {
     //console.log("all visible tiles have been loaded");
     $("#loading").fadeOut(500);
 });
+windKnots.bindPopup(function (error, featureCollection) {
+    if (error || featureCollection.features.length === 0) {
+        return "No information found. Try another location.";
+
+    } else {
+        return 'Wind Knots: ' + round(featureCollection.features[0].properties['Pixel Value'],2) + 'kt';
+    }
+});
 var windGusts = L.esri.dynamicMapLayer({
     url: rtmaRest,
-    layers: [23, 3],
-    opacity: .7, useCache: true, crossOrigin: true, cacheMaxAge: 1800000
+    layers: [3,23],
+    opacity: .7, useCache: true, cacheMaxAge: 1800000,
+    f: 'image',
 });
 windGusts.on("load", function () {
     //console.log("all visible tiles have been loaded");
     $("#loading").fadeOut(500);
 });
+windGusts.bindPopup(function (error, featureCollection) {
+    if (error || featureCollection.features.length === 0) {
+        return "No information found. Try another location.";
 
+    } else {
+        return 'Wind Gusts: ' + round(featureCollection.features[0].properties['Pixel Value'],2) + 'kt';
+    }
+});
 /************ TOTAL SKY COVER % **************/
 var skyCover = L.esri.dynamicMapLayer({
     url: forecastRest,
     layers: [27],
-    opacity: .7, useCache: true, crossOrigin: true, cacheMaxAge: 1800000
+    opacity: .7, useCache: true, cacheMaxAge: 1800000,
+    f: 'image',
 });
 skyCover.on("load", function () {
     //console.log("all visible tiles have been loaded");
     $("#loading").fadeOut(500);
 });
-
-var popup = L.popup().setContent('<strong>LOADING...</strong>');
+skyCover.bindPopup(function (error, featureCollection) {
+    if (error || featureCollection.features.length === 0) {
+        return "No information found. Try another location.";
+    } else {
+        return 'Sky Cover: ' + round(featureCollection.features[0].properties['Pixel Value'],2) + '%';
+    }
+});
 
 /*OUR LAYERS TO SHOW / HIDE*/
 var baseMaps = {
@@ -312,17 +561,26 @@ var baseMaps = {
     "World Street": Esri_WorldStreetMap,
     "National Georaphic": Esri_NatGeoWorldMap
 };
-//            var overlayMaps = {
-//                        "Relative Humidity (2m AGL)": surfaceRH,
-//                 "Temperature (2m AGL)": surfaceTemp,
-//                 "Dew Point (2m AGL)": surfaceDP,
-//         //                    "Surface MinTemp": minTemp,
-//         //                    "Surface MaxTemp": maxTemp,
-//                 "24hr Precip": twentyFourHrPrecip,
-//                 "Wind (kt - 10m AGL)": windKnots,
-//                 "Wind (gusts - 10m AGL)": windGusts,
-//                 "Cloud Cover %": skyCover,
-//            };
+            var overlayLayers = {
+      //                    "Mixing Height" : ,
+//                    "Ventilation Index",
+//                    "Haines (middle) Index",
+//                    "Haines (upper) Index",
+//                    "Lifted Index",
+        "Relative Humidity (2m AGL)": surfaceRH,
+        "Temperature (2m AGL)": surfaceTemp,
+        "Dew Point (2m AGL)": surfaceDP,
+//                    "Surface MinTemp": minTemp,
+//                    "Surface MaxTemp": maxTemp,
+        "24hr Precip": twentyFourHrPrecip,
+        "Wind (kt - 10m AGL)": windKnots,
+        "Wind (gusts - 10m AGL)": windGusts,
+        "Cloud Cover %": skyCover,
+        "NEXRAD Loop": nexradWMSTimeLayer,
+        "Lightning (15min Density) Loop": lightningWMSTimeLayer,
+        "Surface RH Loop":surfaceRHWMSTimeLayer,
+        "Surface AirTemp Loop":surfaceAirTempWMSTimeLayer,
+            };
 
 var groupedOverlays = {
     "Weather Overlays": {
@@ -342,18 +600,23 @@ var groupedOverlays = {
         "Cloud Cover %": skyCover,
     },
     "Weather Loops": {
-        "MaxTemp Loop": radarLayer,
-        "Fire Wx Forecast": hazardsLayer,
+        "NEXRAD": nexradWMSTimeLayer,
+        "Lightning (15min Density)": lightningWMSTimeLayer,
+        "Surface RH":surfaceRHWMSTimeLayer,
+        "Surface AirTemp":surfaceAirTempWMSTimeLayer,
     }
 };
 var GOoptions = {
     // exclusive (use radio inputs)
-    exclusiveGroups: ["Weather Overlays", "Weather Loops"]
+    //exclusiveGroups: ["Weather Overlays"],
+    groupCheckboxes: true,
+    collapsed: false,
 };
-L.control.groupedLayers(baseMaps, groupedOverlays, GOoptions).addTo(map);
-//var activeL = L.control.activeLayers(baseMaps, overlayMaps).addTo(map);
-//console.log(activeL.getActiveOverlayLayers());
-//L.control.layers(baseMaps, overlayMaps).addTo(map);
+//L.control.groupedLayers(baseMaps, groupedOverlays,GOoptions).addTo(map);
+
+var activeControl = L.control.activeLayers(baseMaps, overlayLayers,{collapsed:false});
+activeControl.addTo(map);
+
 
 function round(value, decimals) {
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
@@ -450,29 +713,12 @@ map.on("click contextmenu", function (e) {
     }
 });
 
-surfaceDP.bindPopup(function (error, featureCollection) {
-    if (error || featureCollection.features.length === 0) {
-        return "No information found. Try another location.";
+/*OPACITY SETTINGS*/
+var higherOpacity = new L.Control.higherOpacity();
+map.addControl(higherOpacity);
+var lowerOpacity = new L.Control.lowerOpacity();
+map.addControl(lowerOpacity);
+var opacitySlider = new L.Control.opacitySlider();
+//map.addControl(opacitySlider);
 
-    } else {
-        return 'Dew Point: ' + round(featureCollection.features[0].properties['Pixel Value'],2) + '%';
-    }
-});
 
-map.on('click', function (e) {
-    L.esri.identifyFeatures({
-        url: rtmaRest
-    })
-            .on(map)
-            .at(e.latlng)
-            .layers('visible:15')
-            .run(function (error, featureCollection, response) {
-                //console.log(error + " - " + featureCollection + " - " + response);
-                console.log(featureCollection.features[0].properties['Pixel Value']);
-//                     if(error || featureCollection.features.length === 0) {
-//                        return false;
-//                      } else {
-//                        return 'Minimum Temperature: ' + featureCollection.features[0].properties['Pixel Value'];
-//                      }
-            });
-});
