@@ -130,25 +130,10 @@ map.on("click",function(){
     popup.update();
 });
 
-/*
- * placeholder for variable from custom radio button layer list...
- * 
- */
-//            var l = "8";
-//
-//            var currentLayer;
-//            var minTemp;
-//            
-//            $( ".radio-group" ).change(function() {
-////                currentLayer = minTemp.getLayers();
-////                console.log(currentLayer);
-////                currentLayer.removeLayer();
-//                var layerSelected = $('input[name=radio-group-wxlayers]:checked').val();
-//                
-//                
-//            });  
-//            
 //LOADING AFTER DOM READY TO SEE LAYER GROUP...
+var mapOverlayOpacity = "0.7";
+
+
 $(document).ready(function () {
     $('body').append('<div id="loading"><p>LOADING DATA...</p><div class="progress"><div class="indeterminate"></div></div></div>');
     $("#leaflet-control-layers-group-1 label > input").on("click",function () {
@@ -162,7 +147,7 @@ $(document).ready(function () {
     $(".leaflet-bar-timecontrol").hide();
     $("#leaflet-control-layers-group-2 label > input").on("click",function () {
          if($(this).is(':checked')){ 
-            $("#loading").fadeIn(500);
+            $("#loading").fadeOut(500);
             $(".leaflet-bar-timecontrol").fadeIn(100);
         }else{
             $(".leaflet-bar-timecontrol").fadeOut(100);
@@ -555,10 +540,10 @@ var groupedOverlays = {
 var GOoptions = {
     // exclusive (use radio inputs)
     //exclusiveGroups: ["Weather Overlays"],
-    groupCheckboxes: true,
+    groupCheckboxes: false,
     collapsed: false,
 };
-L.control.groupedLayers(baseMaps, groupedOverlays,GOoptions).addTo(map);
+var ctrlLayers = L.control.groupedLayers(baseMaps, groupedOverlays,GOoptions).addTo(map);
 
 function round(value, decimals) {
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
@@ -663,22 +648,63 @@ map.addControl(lowerOpacity);
 var opacitySlider = new L.Control.opacitySlider();
 //map.addControl(opacitySlider);
 
-opacitySlider.setOpacityLayer(skyCover);
+map.on('overlayadd', function(a) {
+    console.log(a);
+    if(map.hasLayer(surfaceRH)){
+        opacitySlider.setOpacityLayer(surfaceRH);
+    }
+   if(map.hasLayer(surfaceTemp)){
+        opacitySlider.setOpacityLayer(surfaceTemp);
+    }
+    if(map.hasLayer(surfaceDP)){
+        opacitySlider.setOpacityLayer(surfaceDP);
+    }
+    if(map.hasLayer(twentyFourHrPrecip)){
+        opacitySlider.setOpacityLayer(twentyFourHrPrecip);
+    }
+    if(map.hasLayer(windKnots)){
+        opacitySlider.setOpacityLayer(windKnots);
+    }
+    if(map.hasLayer(windGusts)){
+        opacitySlider.setOpacityLayer(windGusts);
+    }
+    if(map.hasLayer(skyCover)){
+        opacitySlider.setOpacityLayer(skyCover);
+    }
+    if(map.hasLayer(nexradWMSTimeLayer)){
+        opacitySlider.setOpacityLayer(nexradWMSTimeLayer);
+    }
+    if(map.hasLayer(lightningWMSTimeLayer)){
+        opacitySlider.setOpacityLayer(lightningWMSTimeLayer);
+    }
+    if(map.hasLayer(surfaceRHWMSLayer)){
+        opacitySlider.setOpacityLayer(surfaceRHWMSTimeLayer);
+    }
+    if(map.hasLayer(surfaceAirTempWMSTimeLayer)){
+        opacitySlider.setOpacityLayer(surfaceAirTempWMSTimeLayer);
+    }
+    /*
+    "Relative Humidity (2m AGL)": surfaceRH,
+        "Temperature (2m AGL)": surfaceTemp,
+        "Dew Point (2m AGL)": surfaceDP,
+        "24hr Precip": twentyFourHrPrecip,
+        "Wind (kt - 10m AGL)": windKnots,
+        "Wind (gusts - 10m AGL)": windGusts,
+        "Cloud Cover %": skyCover,
+        "NEXRAD": nexradWMSTimeLayer,
+        "Lightning (15min Density)": lightningWMSTimeLayer,
+        "Surface RH":surfaceRHWMSTimeLayer,
+        "Surface AirTemp":surfaceAirTempWMSTimeLayer,
+    */
+   
+});
 
-//map.on('click', function (e) {
-//    L.esri.identifyFeatures({
-//        url: rtmaRest
-//    })
-//            .on(map)
-//            .at(e.latlng)
-//            .layers('top')
-//            .run(function (error, featureCollection, response) {
-//                //console.log(error + " - " + featureCollection + " - " + response);
-//                console.log(featureCollection.features[0].properties['Pixel Value']);
-////                     if(error || featureCollection.features.length === 0) {
-////                        return false;
-////                      } else {
-////                        return 'Minimum Temperature: ' + featureCollection.features[0].properties['Pixel Value'];
-////                      }
-//            });
-//});
+// map.on('layerremove', function(event) {
+//     console.log("LAYEREMOVE");
+//     console.log(event.layer);    
+// });
+//
+// map.on('layeradd', function(event) {
+//     console.log("LAYERADD");
+//     console.log(event.layer);
+// });
