@@ -167,16 +167,23 @@ codepen: https://codepen.io/holdencreative/pen/vEVbwv
 #legend {
     position: absolute;
     bottom: 10px;
-    right: 10px;
+    left: 10px;
     z-index: 1000;
     padding: 1em;
     background: white;
     height:300px;
     width:200px;
-    overflow: scroll;
+    overflow-y: scroll;
     display:none;
+	border-radius:5px;
+	border:3px solid rgba(0,0,0,.4);
   }
-  
+  #legend ul {
+    margin: 5px;
+    padding: 5px;
+    font-family: sans-serif;
+    font-size: 11px;
+}
   #time-ranges {
     position: absolute;
     bottom: 10px;

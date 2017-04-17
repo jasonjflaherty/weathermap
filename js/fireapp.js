@@ -130,10 +130,9 @@ map.on("click",function(){
     popup.update();
 });
 
-//LOADING AFTER DOM READY TO SEE LAYER GROUP...
+//set map opacity intially if needed
 var mapOverlayOpacity = "0.7";
-
-
+//LOADING AFTER DOM READY TO SEE LAYER GROUP...
 $(document).ready(function () {
     $('body').append('<div id="loading"><p>LOADING DATA...</p><div class="progress"><div class="indeterminate"></div></div></div>');
     $("#leaflet-control-layers-group-1 label > input").on("click",function () {
@@ -282,7 +281,6 @@ lightningWMSLayer.on("load", function () {
     $(".leaflet-bar-timecontrol").fadeIn();
     $("#loading").fadeOut(500);
 });
-
 /********* REST ************/
 /********** MIN/MAX TEMPS **************/
 
@@ -649,18 +647,88 @@ var opacitySlider = new L.Control.opacitySlider();
 //map.addControl(opacitySlider);
 
 map.on('overlayadd', function(a) {
-    console.log(a);
+    //console.log(a);
     if(map.hasLayer(surfaceRH)){
         opacitySlider.setOpacityLayer(surfaceRH);
+        surfaceRH.legend(function(error, legend){
+            console.log(legend);
+            var layernum = surfaceRH.options.layers;
+            $("#legend").show();
+            if(!error) {
+                var i = layernum;
+                var html = '<ul>';
+                //for(var i = 0, len = legend.layers.length; i < len; i++) {
+                    html += '<li><strong>' + legend.layers[i].layerName + '</strong><ul>';
+                    for(var j = 0, jj = legend.layers[i].legend.length; j < jj; j++){
+                        html += L.Util.template('<li><img width="{width}" height="{height}" src="data:{contentType};base64,{imageData}"><span>{label}</span></li>', legend.layers[i].legend[j]);
+                    }
+                    html += '</ul></li>';
+               // }
+                html+='</ul>';
+                document.getElementById('legend').innerHTML = html;
+            }
+        });
     }
    if(map.hasLayer(surfaceTemp)){
         opacitySlider.setOpacityLayer(surfaceTemp);
+        surfaceTemp.legend(function(error, legend){
+            var layernum = surfaceTemp.options.layers;
+            $("#legend").show();
+            if(!error) {
+                var i = layernum;
+                var html = '<ul>';
+                //for(var i = 0, len = legend.layers.length; i < len; i++) {
+                    html += '<li><strong>' + legend.layers[i].layerName + '</strong><ul>';
+                    for(var j = 0, jj = legend.layers[i].legend.length; j < jj; j++){
+                        html += L.Util.template('<li><img width="{width}" height="{height}" src="data:{contentType};base64,{imageData}"><span>{label}</span></li>', legend.layers[i].legend[j]);
+                    }
+                    html += '</ul></li>';
+               // }
+                html+='</ul>';
+                document.getElementById('legend').innerHTML = html;
+            }
+        });
     }
     if(map.hasLayer(surfaceDP)){
         opacitySlider.setOpacityLayer(surfaceDP);
+        surfaceDP.legend(function(error, legend){
+            console.log(legend);
+            var layernum = surfaceDP.options.layers;
+            $("#legend").show();
+            if(!error) {
+                var i = layernum;
+                var html = '<ul>';
+                //for(var i = 0, len = legend.layers.length; i < len; i++) {
+                    html += '<li><strong>' + legend.layers[i].layerName + '</strong><ul>';
+                    for(var j = 0, jj = legend.layers[i].legend.length; j < jj; j++){
+                        html += L.Util.template('<li><img width="{width}" height="{height}" src="data:{contentType};base64,{imageData}"><span>{label}</span></li>', legend.layers[i].legend[j]);
+                    }
+                    html += '</ul></li>';
+               // }
+                html+='</ul>';
+                document.getElementById('legend').innerHTML = html;
+            }
+        });
     }
     if(map.hasLayer(twentyFourHrPrecip)){
         opacitySlider.setOpacityLayer(twentyFourHrPrecip);
+        twentyFourHrPrecip.legend(function(error, legend){
+            console.log(legend);
+            $("#legend").show();
+            if(!error) {
+                var i = 11;
+                var html = '<ul>';
+                //for(var i = 0, len = legend.layers.length; i < len; i++) {
+                    html += '<li><strong>' + legend.layers[i].layerName + '</strong><ul>';
+                    for(var j = 0, jj = legend.layers[i].legend.length; j < jj; j++){
+                        html += L.Util.template('<li><img width="{width}" height="{height}" src="data:{contentType};base64,{imageData}"><span>{label}</span></li>', legend.layers[i].legend[j]);
+                    }
+                    html += '</ul></li>';
+               // }
+                html+='</ul>';
+                document.getElementById('legend').innerHTML = html;
+            }
+        });
     }
     if(map.hasLayer(windKnots)){
         opacitySlider.setOpacityLayer(windKnots);
