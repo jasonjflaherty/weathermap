@@ -2663,11 +2663,4 @@ codepen: https://codepen.io/holdencreative/pen/vEVbwv
   background: #5C7DB8;
   border-color: #5C7DB8; }
 
-/*ui slider*/
-#oSlider {
-  z-index: 10000;
-  position: absolute;
-  left: 15px;
-  top: 210px; }
-
 /*# sourceMappingURL=mapstyle.css.map */

@@ -29,7 +29,7 @@ var Esri_NatGeoWorldMap = L.tileLayer('http://server.arcgisonline.com/ArcGIS/res
 var map = L.map('map', {
     layers: [Esri_WorldStreetMap],
     center: [43.6007847,-116.3039378],
-    zoom: 5,
+    zoom: 6,
     loadingControl: true,
 //    timeDimension: true,
 //    timeDimensionControl: true,
@@ -169,42 +169,6 @@ $(document).ready(function () {
             $("#loading").fadeOut(500);
         }
     });
-    
-     //'basemap'
-    $(".leaflet-control-layers-base input").on("click",function(){
-        console.log(activeControl.getActiveBaseLayer().name);
-    }); 
-    
-    //overlays
-    $(".leaflet-control-layers-overlays input").on("click",function(){
-        var overlayLayers = activeControl.getActiveOverlayLayers();
-        for (var overlayId in overlayLayers) {
-            $( "#oSlider" ).slider({
-                orientation: "vertical",
-                range: "min",
-                min: 1,
-                max: 9,
-                value: 6,
-                steps:0.1,
-                slide: function( event, ui ) {
-                  console.log("0." + ui.value);
-                  //console.log(overlayLayers[overlayId].layer.options.opacity);
-                  
-                  var lOpacity = overlayLayers[overlayId].layer.options.opacity;
-                  console.log(lOpacity);
-                  
-                  skyCover.opacity(ui.value);
-                    //overlayLayers[overlayId].setOpacity(ui.value);
-                }
-            });
-            //console.log($( "#oSlider" ).slider("." + "value" ));
-            opacitySlider.setOpacityLayer(overlayLayers[overlayId]);
-        } 
-    });
-    
-    
-    
-    
 });
 
 /* Loads of NOAA data overlays*/
@@ -485,20 +449,6 @@ surfaceRH.bindPopup(function (error, featureCollection) {
     }
 });
 
-surfaceRH.legend(function(error, legend){
-    if(!error) {
-        var html = '<ul>';
-        for(var i = 0, len = legend.layers.length; i < len; i++) {
-            html += '<li><strong>' + legend.layers[i].layerName + '</strong><ul>';
-            for(var j = 0, jj = legend.layers[i].legend.length; j < jj; j++){
-                html += L.Util.template('<li><img width="{width}" height="{height}" src="data:{contentType};base64,{imageData}"><span>{label}</span></li>', legend.layers[i].legend[j]);
-            }
-            html += '</ul></li>';
-        }
-        html+='</ul>';
-        document.getElementById('legend').innerHTML = html;
-    }
-});
 /*********** surface winds ***********/
 var windKnots = L.esri.dynamicMapLayer({
     url: rtmaRest,
@@ -561,7 +511,7 @@ var baseMaps = {
     "World Street": Esri_WorldStreetMap,
     "National Georaphic": Esri_NatGeoWorldMap
 };
-            var overlayLayers = {
+            var overlayMaps = {
       //                    "Mixing Height" : ,
 //                    "Ventilation Index",
 //                    "Haines (middle) Index",
@@ -576,10 +526,6 @@ var baseMaps = {
         "Wind (kt - 10m AGL)": windKnots,
         "Wind (gusts - 10m AGL)": windGusts,
         "Cloud Cover %": skyCover,
-        "NEXRAD Loop": nexradWMSTimeLayer,
-        "Lightning (15min Density) Loop": lightningWMSTimeLayer,
-        "Surface RH Loop":surfaceRHWMSTimeLayer,
-        "Surface AirTemp Loop":surfaceAirTempWMSTimeLayer,
             };
 
 var groupedOverlays = {
@@ -612,11 +558,7 @@ var GOoptions = {
     groupCheckboxes: true,
     collapsed: false,
 };
-//L.control.groupedLayers(baseMaps, groupedOverlays,GOoptions).addTo(map);
-
-var activeControl = L.control.activeLayers(baseMaps, overlayLayers,{collapsed:false});
-activeControl.addTo(map);
-
+L.control.groupedLayers(baseMaps, groupedOverlays,GOoptions).addTo(map);
 
 function round(value, decimals) {
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
@@ -721,4 +663,22 @@ map.addControl(lowerOpacity);
 var opacitySlider = new L.Control.opacitySlider();
 //map.addControl(opacitySlider);
 
+opacitySlider.setOpacityLayer(skyCover);
 
+//map.on('click', function (e) {
+//    L.esri.identifyFeatures({
+//        url: rtmaRest
+//    })
+//            .on(map)
+//            .at(e.latlng)
+//            .layers('top')
+//            .run(function (error, featureCollection, response) {
+//                //console.log(error + " - " + featureCollection + " - " + response);
+//                console.log(featureCollection.features[0].properties['Pixel Value']);
+////                     if(error || featureCollection.features.length === 0) {
+////                        return false;
+////                      } else {
+////                        return 'Minimum Temperature: ' + featureCollection.features[0].properties['Pixel Value'];
+////                      }
+//            });
+//});

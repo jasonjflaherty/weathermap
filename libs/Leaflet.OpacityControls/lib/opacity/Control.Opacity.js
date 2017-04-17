@@ -11,7 +11,6 @@ var opacity_layer;
 
 //Create a control to increase the opacity value. This makes the image more opaque.
 L.Control.higherOpacity = L.Control.extend({
-    
     options: {
         position: 'topleft'
     },
