@@ -653,17 +653,19 @@ map.on('overlayadd', function(a) {
         surfaceRH.legend(function(error, legend){
             console.log(legend);
             var layernum = surfaceRH.options.layers;
+            //console.log(layernum - 11);
             $("#legend").show();
             if(!error) {
-                var i = layernum;
+                //-11 to find the correct legend layer?!
+                var i = layernum - 11;
                 var html = '<ul>';
                 //for(var i = 0, len = legend.layers.length; i < len; i++) {
-                    html += '<li><strong>' + legend.layers[i].layerName + '</strong><ul>';
+                    html += '<li><strong>Surface RH</strong><ul>';
                     for(var j = 0, jj = legend.layers[i].legend.length; j < jj; j++){
                         html += L.Util.template('<li><img width="{width}" height="{height}" src="data:{contentType};base64,{imageData}"><span>{label}</span></li>', legend.layers[i].legend[j]);
                     }
                     html += '</ul></li>';
-               // }
+                //}
                 html+='</ul>';
                 document.getElementById('legend').innerHTML = html;
             }
@@ -673,12 +675,14 @@ map.on('overlayadd', function(a) {
         opacitySlider.setOpacityLayer(surfaceTemp);
         surfaceTemp.legend(function(error, legend){
             var layernum = surfaceTemp.options.layers;
+            console.log(legend);
+            console.log(layernum);
             $("#legend").show();
             if(!error) {
-                var i = layernum;
+                var i = layernum - 3;
                 var html = '<ul>';
                 //for(var i = 0, len = legend.layers.length; i < len; i++) {
-                    html += '<li><strong>' + legend.layers[i].layerName + '</strong><ul>';
+                    html += '<li><strong>Surface Temperature</strong><ul>';
                     for(var j = 0, jj = legend.layers[i].legend.length; j < jj; j++){
                         html += L.Util.template('<li><img width="{width}" height="{height}" src="data:{contentType};base64,{imageData}"><span>{label}</span></li>', legend.layers[i].legend[j]);
                     }
@@ -696,10 +700,11 @@ map.on('overlayadd', function(a) {
             var layernum = surfaceDP.options.layers;
             $("#legend").show();
             if(!error) {
-                var i = layernum;
+                console.log(layernum);
+                var i = layernum - 4;
                 var html = '<ul>';
                 //for(var i = 0, len = legend.layers.length; i < len; i++) {
-                    html += '<li><strong>' + legend.layers[i].layerName + '</strong><ul>';
+                    html += '<li><strong>Dew Point</strong><ul>';
                     for(var j = 0, jj = legend.layers[i].legend.length; j < jj; j++){
                         html += L.Util.template('<li><img width="{width}" height="{height}" src="data:{contentType};base64,{imageData}"><span>{label}</span></li>', legend.layers[i].legend[j]);
                     }
@@ -714,12 +719,14 @@ map.on('overlayadd', function(a) {
         opacitySlider.setOpacityLayer(twentyFourHrPrecip);
         twentyFourHrPrecip.legend(function(error, legend){
             console.log(legend);
+            var layernum = surfaceDP.options.layers;
+            console.log(layernum);
             $("#legend").show();
             if(!error) {
-                var i = 11;
+                var i = layernum - 4;
                 var html = '<ul>';
                 //for(var i = 0, len = legend.layers.length; i < len; i++) {
-                    html += '<li><strong>' + legend.layers[i].layerName + '</strong><ul>';
+                    html += '<li><strong>24hr Precipitation</strong><ul>';
                     for(var j = 0, jj = legend.layers[i].legend.length; j < jj; j++){
                         html += L.Util.template('<li><img width="{width}" height="{height}" src="data:{contentType};base64,{imageData}"><span>{label}</span></li>', legend.layers[i].legend[j]);
                     }
@@ -732,12 +739,71 @@ map.on('overlayadd', function(a) {
     }
     if(map.hasLayer(windKnots)){
         opacitySlider.setOpacityLayer(windKnots);
+        windKnots.legend(function(error, legend){
+            
+            var layernum = windKnots.options.layers;
+            
+            $("#legend").show();
+            if(!error) {
+                var i = 14;
+                var html = '<ul>';
+                //for(var i = 0, len = legend.layers.length; i < len; i++) {
+                    html += '<li><strong>Wind Knots</strong><ul>';
+                    for(var j = 0, jj = legend.layers[i].legend.length; j < jj; j++){
+                        html += L.Util.template('<li><img width="{width}" height="{height}" src="data:{contentType};base64,{imageData}"><span>{label}</span></li>', legend.layers[i].legend[j]);
+                    }
+                    html += '</ul></li>';
+               // }
+                html+='</ul>';
+                document.getElementById('legend').innerHTML = html;
+            }
+        });
     }
     if(map.hasLayer(windGusts)){
         opacitySlider.setOpacityLayer(windGusts);
+       windGusts.legend(function(error, legend){
+            
+            var layernum = windGusts.options.layers;
+           console.log(legend); 
+           console.log(layernum);
+            $("#legend").show();
+            if(!error) {
+                var i = 17;
+                var html = '<ul>';
+                //for(var i = 0, len = legend.layers.length; i < len; i++) {
+                    html += '<li><strong>Wind Gusts</strong><ul>';
+                    for(var j = 0, jj = legend.layers[i].legend.length; j < jj; j++){
+                        html += L.Util.template('<li><img width="{width}" height="{height}" src="data:{contentType};base64,{imageData}"><span>{label}</span></li>', legend.layers[i].legend[j]);
+                    }
+                    html += '</ul></li>';
+               // }
+                html+='</ul>';
+                document.getElementById('legend').innerHTML = html;
+            }
+        });
     }
     if(map.hasLayer(skyCover)){
         opacitySlider.setOpacityLayer(skyCover);
+        skyCover.legend(function(error, legend){
+            var layernum = skyCover.options.layers;
+            
+           // var layernum = ""
+            $("#legend").show();
+            if(!error) {
+                var i = 20;
+                
+                var html = '<ul>';
+                //for(var i = 0, len = legend.layers.length; i < len; i++) {
+                    html += '<li><strong>Cloud Cover %</strong><ul>';
+                    for(var j = 0, jj = legend.layers[i].legend.length; j < jj; j++){
+                        html += L.Util.template('<li><img width="{width}" height="{height}" src="data:{contentType};base64,{imageData}"><span>{label}</span></li>', legend.layers[i].legend[j]);
+                    }
+                    html += '</ul></li>';
+               // }
+                html+='</ul>';
+                document.getElementById('legend').innerHTML = html;
+            }
+        });
     }
     if(map.hasLayer(nexradWMSTimeLayer)){
         opacitySlider.setOpacityLayer(nexradWMSTimeLayer);

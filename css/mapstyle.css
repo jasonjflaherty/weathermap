@@ -2628,12 +2628,12 @@ codepen: https://codepen.io/holdencreative/pen/vEVbwv
     right: -8%; } }
 #legend {
   position: absolute;
-  bottom: 10px;
+  bottom: 50px;
   left: 10px;
   z-index: 1000;
   padding: 1em;
   background: white;
-  height: 300px;
+  height: 200px;
   width: 200px;
   overflow-y: scroll;
   display: none;
